@@ -1,10 +1,9 @@
 require_relative 'utils'
 
 class Book
-  include Utils
 
   attr_accessor :checked_out, :id, :author, :author_id, :checked_out
-  initialize(attr)
+  def initialize(attr)
     @title = attr["title"]
     @id = attr["id"]
     @author = attr["author"]
@@ -12,31 +11,35 @@ class Book
     @checked_out = attr["checked_out"] && set_bool( attr["checked_out"] )
   end
 
+  def grab_id
+    self.first['id'].to_i()
+  end
+
   def set_bool(bool)
     bool == "f" ? false : true
   end
 
   def self.all
-    all_books = DB.exec("SELECT * FROM books ORDER BY title")
+    all_books = DB.exec("SELECT * FROM books ORDER BY title").first()
     books = []
-    all_books.each do |book|
-      id = book["id"].to_i
+    [all_books].each do |book|
+      id = book["id"]
       title = book["title"]
       author = DB.exec("Select author FROM authors WHERE id = #{ book.author_id }")
       author_id = book["author_id"].to_i
       checked_out = book["checked_out"]
-      books.push(Book.new({id: id, title: title, author: author, author_id: author_id, checked_out: checked_out}))
+      books.push(Book.new({"id" => id, "title" => title, "author" => author, "author_id" => author_id, "checked_out" => checked_out}))
     end
     books
   end
 
   def save
     @author_id = DB.exec(
-      "SELECT id FROM authors WHERE lower(author) = ('#{ @author_id.downcase }');"
-    ).grab_id()
+      "SELECT id FROM authors WHERE lower(author) = ('#{ @author.downcase }');"
+    ).first['id'].to_i()
 
     if !@author_id
-      @author_id = DB.exec("INSERT INTO authors (author) VALUES ('#{ @author }') RETURNING id;").grab_id()
+      @author_id = DB.exec("INSERT INTO authors (author) VALUES ('#{ @author }') RETURNING id;").first['id'].to_i()
     end
 
     @return_values = DB.exec("INSERT INTO books (title, author_id) VALUES ('#{ @title }', '#{ @author_id }') RETURNING id, checked_out;").first()

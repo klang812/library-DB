@@ -1,6 +1,7 @@
 require_relative 'utils'
 
 class Patron
+
   include Utils
   initialze(attr)
     @id = attr['id']
@@ -22,4 +23,5 @@ class Patron
     @book.status()
     DB.exec("UPDATE checkouts SET currently_out = FALSE WHERE book_id = #{ book_id } AND currently_out = TRUE;")
   end
+
 end
