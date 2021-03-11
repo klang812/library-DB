@@ -24,7 +24,7 @@ This is an app made to learn databases using Sinatra and psql databases. This ap
 ### Want to see this webpage now?
 
 
-* Go to ( {http repo} ).
+* Go to ( https://github.com/klang812/library-DB ).
 * Navigate to the code button on the github website.
 
 * Click on the code button to open the menu.
@@ -38,7 +38,7 @@ This is an app made to learn databases using Sinatra and psql databases. This ap
 
 - Once you have chosen your desired directory use the command.
 ```bash
-git clone {repo}
+git clone https://github.com/klang812/library-DB.git
 ```
 
 <div
@@ -103,17 +103,6 @@ ruby "file goes here (no quotes)"
 ```bash
 rspec
 ```
-
-* If there is a problem in the code the testing suite will read as such :
-
-<div>
-  <img src="public/img/rspec-f2.PNG" alt="Failing RSpec test">
-</div>
-
-* Follow the examples and read the English that describes what the function should do. If everything is in order you should receive back :
-<div>
-  <img src="public/img/rspec-p.PNG" alt="Passing RSpec test">
-</div>
 
 ## Addition comments:
 * Created on 3/10/21

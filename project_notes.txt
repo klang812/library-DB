@@ -1,0 +1,165 @@
+As a librarian, I want to create, read, update, delete, and list books in the catalog, so that we can keep track of our inventory.
+As a librarian, I want to search for a book by author or title, so that I can find a book easily when the book inventory at the library grows large.
+As a patron, I want to check a book out, so that I can take it home with me.
+As a patron, I want to see a history of all the books I checked out, so that I can look up the name of that awesome sci-fi novel I read three years ago. (Hint: make a checkouts table that is a join table between patrons and books.)
+As a patron, I want to know when a book I checked out is due, so that I know when to return it.
+As a librarian, I want to see a list of overdue books, so that I can call up the patron who checked them out and tell them to bring them back - OR ELSE!
+As a librarian, I want to enter multiple authors for a book, so that I can include accurate information in my catalog. (Hint: make an authors table and a books table with a many-to-many relationship.)
+
+
+TO DO         =>
+
+~ find_author
+
+~ fix grab_id
+
+              <=
+
+
+Radio button select from >  Author() Titles() _______________
+                           |_________________________________|
+
+
+Search for a author or title >
+    SELECT * FROM books WHERE (name) = #{query}
+    SELECT * FROM authors WHERE (name) = #{query}
+    SELECT * FROM authors WHERE (name)
+
+Tables >
+  #=> CREATE TABLE books (id serial PRIMARY KEY, title varchar, author_id int, checked_out boolean)
+  #=> CREATE TABLE authors (id serial PRIMARY KEY, author varchar)
+  #=> CREATE TABLE patrons (id serial PRIMARY KEY, name varchar)
+  #=> CREATE TABLE checkouts (id serial PRIMARY KEY, book_id, patron_id, (currently_out boolean = TRUE))
+>
+
+Set Default >
+  #=> ALTER TABLE books
+  #=> ALTER COLUMN checked_out
+  #=> SET DEFAULT (FALSE OR FALSE);
+
+  Declarative >
+    #=> (currently_out boolean DEFAULT TRUE);
+  >
+>
+
+Library concepts >
+
+  input => books query   => Book:   'My Favorite Book'
+  input => authors query => Author: 'Barnaby Jones'
+
+  Possible structure => {:id => PRIMARY KEY (nil), :title => BQ, :author_id=> nil, :author => AQ, :checked_out => DEFAULT FALSE}
+
+  class Book
+    attr_accesor :checked_out
+
+    initialize(attr)
+      @title = attr["title"]
+      @id = attr["id"]
+      @author = attr["author"]
+      @author_id = attr["author_id"]
+      @checked_out = attr["checked_out"]
+    end
+
+    def self.all
+      all_books = DB.exec("SELECT * FROM books ORDER BY title")
+      books = []
+      all_books.each do |book|
+        id = book["id"].to_i
+        title = book["title"]
+        author = book["author"]
+        author_id = book["author_id"].to_i
+        checked_out = book["checked_out"]
+        books.push(Book.new({id: id, title: title, author: author, author_id: author_id, checked_out: checked_out}))
+      end
+      books
+    end
+
+    def save
+
+      @author_id = DB.exec("SELECT id FROM authors WHERE lower(author) = ('#{ @author_id.downcase }');").grab_id()
+
+      if !author_id
+        @author_id = DB.exec("INSERT INTO authors (author) VALUES ('#{ AQ }') RETURNING id;").grab_id()
+      end
+
+      @id = DB.exec("INSERT INTO books (title, author_id) VALUES ('#{ BQ }', '#{ @author_id }') RETURNING id;").grab_id()
+
+    end
+
+    def grab_id
+      self.first['id'].to_i()
+    end
+
+    def status
+      status = !@checked_out
+      DB.exec("UPDATE books SET checked_out = #{status} WHERE id = #{@id}")
+    end
+
+    def self.find_book( :url )
+      @book = DB.exec("SELECT * FROM books WHERE id = #{ :url };").first()
+      Book.new(@book)
+    end
+
+    def update(attributes)
+      if (attributes.has_key?(:title)) && (attributes.fetch(:title) != nil)
+        @title = attributes.fetch(:title)
+        DB.exec("UPDATE books SET title = '#{@title}' WHERE id = #{@id};)
+      end
+      if (attributes.has_key?(:author)) && (attributes.fetch(:author) != nil)
+        @author = attributes.fetch(:author)
+        DB.exec("UPDATE authors SET author = '#{@author}' WHERE id = #{@author_id};)
+      end
+    end
+
+    def self.delete ( :url )
+      DB.exec("DELETE FROM books WHERE id = #{  :url };")
+
+    end
+  end
+>
+
+Patrons Concepts >
+
+Possible structure => {:id => PRIMARY KEY (nil), :name => PQ, :book_id => nil}
+
+class Patrons
+  initialze(attr)
+    @id = attr['id']
+    @name = attr['name']
+  end
+
+|)~~~~~~~~~~~~~~~~~~~~~~~~>
+
+  :URL
+
+  Avalible Data
+    @title = attr.BQ
+    @id = attr.id
+    @author = attr.author
+    @author_id = attr.author_id
+    @checked_out = attr.checked_out
+
+  #=> CREATE TABLE patrons (id serial PRIMARY KEY, name varchar)
+  #=> CREATE TABLE checkouts (id serial PRIMARY KEY, book_id int, patron_id int, currently_out boolean DEFAULT TRUE)
+
+|)~~~~~~~~~~~~~~~~~~~~~~~~>
+
+  def save()
+    @id = DB.exec("INSERT INTO patrons (name) VALUES ('#{@name}') RETURNING id;").grab_id
+  end
+
+  def checkout_book( :url )
+    @book = Book.find_book( :url )
+    @book.status()
+    DB.exec("INSERT INTO checkouts (book_id, patron_id) VALUES (#{ :url }, #{@id});")
+  end
+
+  def return_book( :url )
+    @book = Book.find_book( :url )
+    @book.status()
+    DB.exec("UPDATE checkouts SET currently_out = FALSE WHERE book_id = #{:url} AND currently_out = TRUE;")
+  end
+end
+
+>
+

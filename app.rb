@@ -1,9 +1,9 @@
-require ('sinatra'
-require('sinatra'
-require('sinatra/reloader'
-require('pry'
+require 'sinatra'
+require 'sinatra'
+require 'sinatra/reloader'
+require 'pry'
 also_reload 'lib/**/*.rb'
 
-get('/')
+get '/'
   'welcome'
 end
