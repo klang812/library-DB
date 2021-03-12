@@ -1,0 +1,16 @@
+<h1>All of our Authors</h1>
+
+  <% if @authors.any? %>
+    <ul>
+      <%=
+          @authors.map { |author|
+            <<-HERE
+              <li><a href="/authors/#{author["id"]}">#{author["author"]}</a></li>
+            HERE
+          }.map(&:strip).join('')
+      %>
+    </ul>
+    <p><a href="/books">Switch to a List of All Books</a></p>
+<% else %>
+  <p>We don't currently have any authors to list</p>
+<% end %>

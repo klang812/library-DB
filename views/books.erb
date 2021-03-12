@@ -1,0 +1,30 @@
+<h1>THE BEEZ NEEZ</h1>
+
+
+<h1>Add a new book</h1>
+
+<form action="/books" method="post">
+  <div class="form-group">
+    <label for="title">Book Title</label>
+    <input id="n" name="title" class="form-control" type="text" required>
+    <label for="author">Author</label>
+    <input id="n" name="author" class="form-control" type="text" required>
+  </div>
+  <button type="submit" class="btn">Add Book</button>
+</form>
+
+<div id="book-shelf">
+  <%=
+    @books && @books.map{
+      |book|
+        <<-Book
+          <a href="/books/#{book.id}" class="book">
+            <p>#{book.title}</p>
+            <p>#{book.author}</p>
+            <p>#{book.checked_out ? 'checked out' : 'available!'}</p>
+          </a>
+        Book
+    }.map(&:strip).join('')
+  %>
+</div>
+<p><a href="/authors">Switch to a List of All Authors</a></p>

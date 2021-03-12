@@ -1,0 +1,23 @@
+<% if @book %>
+  <h2>Book Title: <%= @book.title %></h2>
+  <h3>Author: <%= @book.author %></h3>
+
+  <form action="/books/<%= @book.id %>" method="post">
+    <input name="_method" type="hidden" value="patch">
+
+    <label for="title">Update Book Title</label>
+    <input id="title" name="title" type="text" required>
+
+    <button type="submit">Update</button>
+  </form>
+
+  <p><a href="/books">Return to Book List</a></p>
+
+  <form action="/books/<%= @book.id %>" method="post">
+    <input name="_method" type="hidden" value="delete" required>
+    <button type="submit">Destroy Book</button>
+  </form>
+<% else %>
+  <h3>Unfortunately that book is not in stock... sorry!</h3>
+  <a href="/books">Take Me Back To The Library</a>
+<% end %>

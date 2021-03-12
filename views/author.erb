@@ -1,0 +1,17 @@
+<% if @author %>
+  <h3>Author: <%= @author.author %></h3>
+
+  <form action="/authors/<%= @book.id %>" method="post">
+    <input name="_method" type="hidden" value="patch">
+
+    <label for="author">Update Author</label>
+    <input id="title" name="author" type="text" required>
+    <button type="submit">Update</button>
+  </form>
+
+  <p><a href="/authors">Return to Author List</a></p>
+
+<% else %>
+  <h3>Unfortunately we don't have any books by that author.. sorry!</h3>
+  <a href="/">Take Me Home</a>
+<% end %>

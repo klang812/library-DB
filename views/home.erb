@@ -1,12 +1,4 @@
-<%=
-  @books && @books.map{
-    |book|
-      <<-Book
-        <div>
-          <p>#{book.title}</p>
-          <p>#{book.author}</p>
-          <p>#{book.checked_out ? 'checked out' : 'availible!'}</p>
-        </div>
-      Book
-  }.map(&:strip).join('')
-%>
+<h1>Welcome to the Library!</h1>
+
+<p><a href="/books">View a List of Books</a></p>
+<p><a href="/authors">View a List of Authors</a></p>
